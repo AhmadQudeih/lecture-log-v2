@@ -18,17 +18,24 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Generate Gradle Wrapper
-      run: gradle wrapper
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
-    - name: Build with Gradle
-      run: ./gradlew assembleDebug --stacktrace
+    - name: Navigate to project folder and build
+      run: |
+        # التأكد من الدخول إلى مجلد المشروع إذا كان داخلياً
+        if [ -d "lecture-log/UT lecture-log" ]; then
+          cd "lecture-log/UT lecture-log"
+        elif [ -d "lecture-log" ]; then
+          cd "lecture-log"
+        fi
+        
+        # توليد الـ Gradle Wrapper إذا لم يكن موجوداً
+        gradle wrapper || true
+        
+        # منح الصلاحيات والبناء
+        chmod +x gradlew || true
+        ./gradlew assembleDebug --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: app-debug
-        path: app/build/outputs/apk/debug/app-debug.apk
+        path: '**/build/outputs/apk/debug/app-debug.apk'
